@@ -3,15 +3,22 @@
 var express = require('express');
 var app = express.createServer();
 var assert = require('should');
+var redis = require('redis');
+var db = redis.createClient();
 var tic = require('../lib/tic-tac-two');
 var should = require('should');
 
-var email = 'test@test.org';
+var userId = 'test@test.org';
 
 describe('game', function() {
+  after(function() {
+    db.flushdb();
+  });
+
   describe('get new board', function() {
     it('returns a new board', function(done) {
-      tic.new(email, function(err, board) {
+      tic.new(userId, db, function(err, board) {
+        //console.log(board)
         should.exist(board);
         done();
       });
@@ -20,10 +27,10 @@ describe('game', function() {
 
   describe('makes a move', function() {
     it('returns an updated board with a valid move', function(done) {
-      tic.new(email, function(err, currBoard) {
+      tic.new(userId, db, function(err, currBoard) {
         var position = '11';
 
-        tic.move(currBoard, position, function(err, currBoard) {
+        tic.move(currBoard.userId, position, db, function(err, currBoard) {
           should.exist(currBoard);
           currBoard.board[position].should.equal(1);
           done();
@@ -32,11 +39,11 @@ describe('game', function() {
     });
 
     it('returns an updated board with an invalid move', function(done) {
-      tic.new(email, function(err, currBoard) {
+      tic.new(userId, db, function(err, currBoard) {
         currBoard.board['11'] = 2;
         var position = '11';
 
-        tic.move(currBoard, position, function(err, currBoard) {
+        tic.move(currBoard.userId, position, db, function(err, currBoard) {
           should.exist(currBoard);
           currBoard.board[position].should.equal(2);
           done();
@@ -45,22 +52,22 @@ describe('game', function() {
     });
 
     it('returns an updated board with winner X', function(done) {
-      tic.new(email, function(err, currBoard) {
+      tic.new(userId, function(err, currBoard) {
         currBoard.board['11'] = 1;
         currBoard.board['12'] = 1;
         currBoard.xArr = [11, 12];
         var position = '13';
 
-        tic.move(currBoard, position, function(err, currBoard) {
+        tic.move(currBoard.userId, position, db, function(err, currBoard) {
           should.exist(currBoard);
-          currBoard.has_won.should.equal('X');
+          currBoard.hasWon.should.equal('X');
           done();
         });
       });
     });
 
     it('returns an updated board with winner O', function(done) {
-      tic.new(email, function(err, currBoard) {
+      tic.new(userId, db, function(err, currBoard) {
         currBoard.board['11'] = 2;
         currBoard.board['12'] = 2;
         currBoard.board['22'] = 2;
@@ -73,16 +80,16 @@ describe('game', function() {
         currBoard.xArr = [13, 21, 3];
         var position = '33';
 
-        tic.move(currBoard, position, function(err, currBoard) {
+        tic.move(currBoard.userId, position, function(err, currBoard) {
           should.exist(currBoard);
-          currBoard.has_won.should.equal('O');
+          currBoard.hasWon.should.equal('O');
           done();
         });
       });
     });
 
     it('returns an updated board with no winner', function(done) {
-      tic.new(email, function(err, currBoard) {
+      tic.new(userId, db, function(err, currBoard) {
         currBoard.board['11'] = 2;
         currBoard.board['12'] = 2;
         currBoard.board['23'] = 2;
@@ -95,9 +102,9 @@ describe('game', function() {
         currBoard.xArr = [13, 21, 22];
         var position = '33';
 
-        tic.move(currBoard, position, function(err, currBoard) {
+        tic.move(currBoard.userId, position, db, function(err, currBoard) {
           should.exist(currBoard);
-          currBoard.has_won.should.equal(false);
+          currBoard.hasWon.should.equal(false);
           done();
         });
       });

@@ -1,4 +1,7 @@
 {
     "domain": "http://localhost",
-    "port": 3000
+    "port": 3000,
+    "redis_dev": 1,
+    "redis_test": 2,
+    "redis_prod": 0
 }

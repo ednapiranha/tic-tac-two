@@ -16,8 +16,17 @@ module.exports = function(app, configurations, express) {
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   });
 
-  app.configure('production', function(){
+  app.configure('development', function() {
+    app.set('tictactwo', nconf.get('redis_dev'));
+  });
+
+  app.configure('test', function() {
+    app.set('tictactwo', nconf.get('redis_test'));
+  });
+
+  app.configure('production', function() {
     app.use(express.errorHandler());
+    app.set('tictactwo', nconf.get('redis_prod'));
   });
 
   return app;
