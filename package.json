@@ -8,10 +8,12 @@
   },
   "dependencies": {
     "connect": ">= 2.3.6",
-    "express": "2.5.11"
+    "express": "2.5.11",
+    "nconf": "0.6.4"
   },
   "devDependencies": {
     "mocha": "1.2.2",
-    "should": ">= 0.0.1"
+    "should": ">= 0.0.1",
+    "sinon": "git://github.com/cjohansen/Sinon.JS.git"
   }
 }
